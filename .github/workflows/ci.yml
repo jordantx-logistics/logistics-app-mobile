@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Calidad
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # El contrato OpenAPI vive en el backend: el generador falla si una ruta que usan
+      # las apps ya no está, o si lo generado no coincide.
+      - name: Checkout del backend (contrato versionado)
+        uses: actions/checkout@v7
+        with:
+          repository: jordantx-logistics/logistics-app-backend
+          ref: develop
+          path: logistics-app-backend
+
+      - name: Preparar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.38.5
+          channel: stable
+          cache: true
+
+      - name: Dependencias
+        run: flutter pub get
+
+      - name: Formato
+        run: dart format --line-length 120 --set-exit-if-changed packages apps tool
+
+      - name: Análisis
+        run: dart analyze --fatal-infos
+
+      - name: Contrato sin deriva
+        env:
+          CONTRACT_PATH: logistics-app-backend/openapi/openapi.yaml
+        run: dart run tool/gen_contract.dart --check
+
+      - name: Tests y cobertura de sincronización
+        working-directory: packages/logistics_core
+        run: flutter test --coverage
+
+      - name: Umbral de cobertura
+        run: dart run tool/coverage_check.dart packages/logistics_core/coverage/lcov.info
+
+  build:
+    name: Compilar apps
+    runs-on: ubuntu-latest
+    needs: quality
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [pda, flota, reparto, corporativa]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Preparar Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: corretto
+          java-version: '17'
+
+      - name: Preparar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.38.5
+          channel: stable
+          cache: true
+
+      - name: Compilar APK de release
+        working-directory: apps/${{ matrix.app }}
+        run: flutter build apk --release --dart-define=API_BASE_URL=https://api.example.invalid

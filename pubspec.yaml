@@ -1,0 +1,22 @@
+name: logistics_mobile_workspace
+publish_to: none
+description: Monorepo de las apps móviles (Fase 8).
+
+environment:
+  sdk: ^3.10.4
+
+workspace:
+  - packages/logistics_core
+  - apps/pda
+  - apps/flota
+  - apps/reparto
+  - apps/corporativa
+
+# SQLCipher en lugar de SQLite: la base local guarda datos personales.
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlcipher
+
+dev_dependencies:
+  yaml: ^3.1.2

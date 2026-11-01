@@ -1,0 +1,31 @@
+name: logistics_core
+description: Sesión, cliente API, base cifrada y motor de sincronización de las apps móviles.
+publish_to: none
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: ^3.10.4
+  flutter: ">=3.38.0"
+
+dependencies:
+  connectivity_plus: ^7.3.2
+  crypto: ^3.0.8
+  dio: ^5.11.1
+  # Fijado por debajo de 2.35: su drift_dev pide un `meta` que Flutter 3.38 no admite.
+  drift: ">=2.34.0 <2.35.0"
+  flutter:
+    sdk: flutter
+  flutter_secure_storage: ^11.2.0
+  path: ^1.9.1
+  path_provider: ^2.1.6
+  sqlite3: ^3.5.2
+  uuid: ^4.6.0
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  drift_dev: ">=2.34.0 <2.35.0"
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
