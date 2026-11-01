@@ -72,7 +72,10 @@ class _SignaturePadState extends State<SignaturePad> {
   Widget build(BuildContext context) {
     return Container(
       height: 200,
-      decoration: BoxDecoration(color: Colors.white, border: Border.all(color: Colors.grey)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey),
+      ),
       // El reconocedor impaciente gana al scroll de la pantalla: un trazo vertical dibuja.
       child: Listener(
         onPointerDown: (event) => widget.controller.startStroke(event.localPosition),

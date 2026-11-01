@@ -107,11 +107,7 @@ class RouteScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _reading(
-    BuildContext context,
-    String title,
-    Future<void> Function(String value) save,
-  ) async {
+  Future<void> _reading(BuildContext context, String title, Future<void> Function(String value) save) async {
     final services = AppScope.of(context);
     final value = await _ask(context, title, 'Odometer (km)');
 
@@ -133,7 +129,10 @@ class RouteScreen extends StatelessWidget {
         final route = snapshot.data?.where((row) => row['id'] == routeId).firstOrNull;
 
         if (route == null) {
-          return Scaffold(appBar: AppBar(), body: const Center(child: Text('This route is no longer assigned to you.')));
+          return Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: Text('This route is no longer assigned to you.')),
+          );
         }
 
         final status = route['status'] as String;
@@ -156,7 +155,8 @@ class RouteScreen extends StatelessWidget {
               if (running) ...[
                 OutlinedButton(
                   key: const Key('route.mileage'),
-                  onPressed: () => _reading(context, 'Odometer reading', (value) => repository.addMileage(route, value)),
+                  onPressed: () =>
+                      _reading(context, 'Odometer reading', (value) => repository.addMileage(route, value)),
                   child: const Text('Register mileage'),
                 ),
                 const SizedBox(height: 8),
@@ -176,7 +176,9 @@ class RouteScreen extends StatelessWidget {
                 OutlinedButton(
                   key: const Key('route.fuel'),
                   onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => FuelScreen(repository: repository, route: route)),
+                    MaterialPageRoute<void>(
+                      builder: (_) => FuelScreen(repository: repository, route: route),
+                    ),
                   ),
                   child: const Text('Add fuel'),
                 ),
@@ -272,11 +274,23 @@ class _FuelScreenState extends State<FuelScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          TextField(controller: _amount, keyboardType: decimal, decoration: const InputDecoration(labelText: 'Amount (S/)')),
+          TextField(
+            controller: _amount,
+            keyboardType: decimal,
+            decoration: const InputDecoration(labelText: 'Amount (S/)'),
+          ),
           const SizedBox(height: 12),
-          TextField(controller: _liters, keyboardType: decimal, decoration: const InputDecoration(labelText: 'Liters')),
+          TextField(
+            controller: _liters,
+            keyboardType: decimal,
+            decoration: const InputDecoration(labelText: 'Liters'),
+          ),
           const SizedBox(height: 12),
-          TextField(controller: _odometer, keyboardType: decimal, decoration: const InputDecoration(labelText: 'Odometer (optional)')),
+          TextField(
+            controller: _odometer,
+            keyboardType: decimal,
+            decoration: const InputDecoration(labelText: 'Odometer (optional)'),
+          ),
           const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: _capture,

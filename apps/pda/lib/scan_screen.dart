@@ -79,13 +79,7 @@ class _ScanScreenState extends State<ScanScreen> {
       return;
     }
 
-    await recordScan(
-      ops: services.ops,
-      type: widget.type,
-      ticketCode: code,
-      agencyId: _agencyId,
-      embarkId: _embarkId,
-    );
+    await recordScan(ops: services.ops, type: widget.type, ticketCode: code, agencyId: _agencyId, embarkId: _embarkId);
 
     setState(() => _recent.insert(0, code));
     await _notify('$code saved.');
@@ -189,11 +183,8 @@ class _ScanScreenState extends State<ScanScreen> {
             Expanded(
               child: ListView.builder(
                 itemCount: _recent.length,
-                itemBuilder: (_, index) => ListTile(
-                  dense: true,
-                  leading: const Icon(Icons.schedule, size: 18),
-                  title: Text(_recent[index]),
-                ),
+                itemBuilder: (_, index) =>
+                    ListTile(dense: true, leading: const Icon(Icons.schedule, size: 18), title: Text(_recent[index])),
               ),
             ),
           ],

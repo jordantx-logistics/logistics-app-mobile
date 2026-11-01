@@ -38,7 +38,12 @@ class FleetReceiptChannel implements SyncChannel {
 
       if (path == null || !File(path).existsSync()) {
         return [
-          OpResult(op.id, OpOutcome.rejected, errorCode: 'LOCAL_FILE_MISSING', message: 'The receipt file is no longer on this device.'),
+          OpResult(
+            op.id,
+            OpOutcome.rejected,
+            errorCode: 'LOCAL_FILE_MISSING',
+            message: 'The receipt file is no longer on this device.',
+          ),
         ];
       }
 
@@ -118,10 +123,7 @@ class RoutesRepository {
 
     final segments = [
       for (final raw in route['segments'] as List)
-        {
-          ...(raw as Map).cast<String, dynamic>(),
-          if (raw['id'] == segmentId) 'status': 'completed',
-        },
+        {...(raw as Map).cast<String, dynamic>(), if (raw['id'] == segmentId) 'status': 'completed'},
     ];
 
     await _save({...route, 'segments': segments});

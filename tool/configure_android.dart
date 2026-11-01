@@ -13,7 +13,11 @@ const _apps = <String, ({String label, List<String> permissions})>{
   'flota': (label: 'Logistics Fleet', permissions: ['android.permission.CAMERA']),
   'reparto': (
     label: 'Logistics Delivery',
-    permissions: ['android.permission.CAMERA', 'android.permission.ACCESS_FINE_LOCATION', 'android.permission.ACCESS_COARSE_LOCATION'],
+    permissions: [
+      'android.permission.CAMERA',
+      'android.permission.ACCESS_FINE_LOCATION',
+      'android.permission.ACCESS_COARSE_LOCATION',
+    ],
   ),
   'corporativa': (
     label: 'Logistics Staff',
@@ -30,7 +34,10 @@ void main() {
       final line = '    <uses-permission android:name="$permission"/>\n';
 
       if (!manifest.contains('android:name="$permission"')) {
-        manifest = manifest.replaceFirst(RegExp(r'(<manifest[^>]*>\n)'), '<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n$line');
+        manifest = manifest.replaceFirst(
+          RegExp(r'(<manifest[^>]*>\n)'),
+          '<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n$line',
+        );
       }
     }
 

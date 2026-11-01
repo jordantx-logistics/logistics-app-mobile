@@ -23,13 +23,15 @@ void main() {
     for (var number = 1; number <= 500; number++) {
       final watch = Stopwatch()..start();
 
-      ids.add(await recordScan(
-        ops: services.ops,
-        type: ScanType.reception,
-        ticketCode: code(number),
-        agencyId: agency,
-        embarkId: null,
-      ));
+      ids.add(
+        await recordScan(
+          ops: services.ops,
+          type: ScanType.reception,
+          ticketCode: code(number),
+          agencyId: agency,
+          embarkId: null,
+        ),
+      );
       local.add(watch.elapsed);
     }
 

@@ -67,7 +67,9 @@ class StopsHome extends StatelessWidget {
                   subtitle: Text('${stop['recipient_address'] ?? 'Pick up at agency'}\n${stop['status']}'),
                   isThreeLine: true,
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => StopScreen(repository: repository, stop: stop)),
+                    MaterialPageRoute<void>(
+                      builder: (_) => StopScreen(repository: repository, stop: stop),
+                    ),
                   ),
                 ),
             ],
@@ -139,7 +141,11 @@ class StopScreen extends StatelessWidget {
           Text('Status: ${stop['status']}', key: const Key('stop.status')),
           const SizedBox(height: 16),
           if (address != null) ...[
-            OutlinedButton.icon(onPressed: _navigate, icon: const Icon(Icons.navigation), label: const Text('Navigate')),
+            OutlinedButton.icon(
+              onPressed: _navigate,
+              icon: const Icon(Icons.navigation),
+              label: const Text('Navigate'),
+            ),
             const SizedBox(height: 8),
           ],
           if (stop['status'] == 'assigned') ...[
@@ -160,12 +166,18 @@ class StopScreen extends StatelessWidget {
             FilledButton(
               key: const Key('stop.complete'),
               onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => DeliverScreen(repository: repository, stop: stop)),
+                MaterialPageRoute<void>(
+                  builder: (_) => DeliverScreen(repository: repository, stop: stop),
+                ),
               ),
               child: const Text('Deliver'),
             ),
             const SizedBox(height: 8),
-            OutlinedButton(key: const Key('stop.fail'), onPressed: () => _fail(context), child: const Text('Not delivered')),
+            OutlinedButton(
+              key: const Key('stop.fail'),
+              onPressed: () => _fail(context),
+              child: const Text('Not delivered'),
+            ),
           ],
         ],
       ),
@@ -282,9 +294,15 @@ class _DeliverScreenState extends State<DeliverScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          TextField(controller: _name, decoration: const InputDecoration(labelText: 'Received by')),
+          TextField(
+            controller: _name,
+            decoration: const InputDecoration(labelText: 'Received by'),
+          ),
           const SizedBox(height: 12),
-          TextField(controller: _document, decoration: const InputDecoration(labelText: 'Document')),
+          TextField(
+            controller: _document,
+            decoration: const InputDecoration(labelText: 'Document'),
+          ),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

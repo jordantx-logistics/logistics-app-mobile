@@ -44,7 +44,9 @@ class PdaHome extends StatelessWidget {
               child: OutlinedButton.icon(
                 key: Key('pda.${type.code}'),
                 onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => ScanScreen(type: type, embarks: embarks)),
+                  MaterialPageRoute<void>(
+                    builder: (_) => ScanScreen(type: type, embarks: embarks),
+                  ),
                 ),
                 icon: Icon(type.icon),
                 label: Text(type.label),

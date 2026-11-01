@@ -25,7 +25,10 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('el chofer abre su ruta y un valor inválido no entra en la cola', (tester) async {
-    final services = await signedInServices(role: 'driver', channels: (api, _) => [fleetEventsChannel(api), FleetReceiptChannel(api)]);
+    final services = await signedInServices(
+      role: 'driver',
+      channels: (api, _) => [fleetEventsChannel(api), FleetReceiptChannel(api)],
+    );
     final repository = RoutesRepository(services);
 
     await repository.refresh();

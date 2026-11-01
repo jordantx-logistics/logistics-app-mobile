@@ -44,7 +44,7 @@ jobs:
         run: flutter pub get
 
       - name: Formato
-        run: dart format --line-length 120 --set-exit-if-changed packages apps tool
+        run: git ls-files '*.dart' | xargs dart format --line-length 120 --set-exit-if-changed
 
       - name: Análisis
         run: dart analyze --fatal-infos

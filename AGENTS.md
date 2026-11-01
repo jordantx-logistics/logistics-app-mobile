@@ -20,7 +20,7 @@ Pub workspace (`pubspec.yaml` en la raíz), Flutter 3.38, solo Android por ahora
 ```bash
 flutter pub get
 dart analyze
-dart format --line-length 120 --set-exit-if-changed packages apps tool
+git ls-files '*.dart' | xargs dart format --line-length 120 --set-exit-if-changed  # no recorre build/
 dart run tool/gen_contract.dart          # regenera las rutas desde el contrato del backend
 dart run tool/gen_contract.dart --check  # falla si hay deriva
 ```
@@ -40,6 +40,8 @@ dart run build_runner build --delete-conflicting-outputs --force-jit
 ```
 
 `--force-jit` es obligatorio: `sqlite3` usa build hooks, que `dart compile` no admite.
+
+No formatees pasando `apps` o `packages` como directorio: `dart format` entra en `build/`, y en Windows falla por las rutas largas de Gradle.
 
 ### Tests de integración
 

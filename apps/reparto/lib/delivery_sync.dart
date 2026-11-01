@@ -33,7 +33,12 @@ class DeliveryChannel implements SyncChannel {
 
         if (missing.isNotEmpty) {
           results.add(
-            OpResult(op.id, OpOutcome.rejected, errorCode: 'LOCAL_FILE_MISSING', message: 'The evidence is no longer on this device.'),
+            OpResult(
+              op.id,
+              OpOutcome.rejected,
+              errorCode: 'LOCAL_FILE_MISSING',
+              message: 'The evidence is no longer on this device.',
+            ),
           );
           continue;
         }
@@ -47,7 +52,12 @@ class DeliveryChannel implements SyncChannel {
           }
 
           results.add(
-            OpResult(op.id, OpOutcome.rejected, errorCode: error.errorCode ?? 'HTTP_${error.statusCode}', message: error.message),
+            OpResult(
+              op.id,
+              OpOutcome.rejected,
+              errorCode: error.errorCode ?? 'HTTP_${error.statusCode}',
+              message: error.message,
+            ),
           );
         }
       }
@@ -157,7 +167,11 @@ class StopsRepository {
     await _setStatus(stop, 'failed');
   }
 
-  Future<String> _enqueue(Map<String, dynamic> stop, Map<String, dynamic> event, {Map<String, String> files = const {}}) {
+  Future<String> _enqueue(
+    Map<String, dynamic> stop,
+    Map<String, dynamic> event, {
+    Map<String, String> files = const {},
+  }) {
     final id = stop['id'] as int;
 
     return _services.ops.enqueue(

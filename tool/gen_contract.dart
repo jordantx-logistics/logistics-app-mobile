@@ -38,8 +38,7 @@ const _operations = <String, String>{
 };
 
 void main(List<String> args) {
-  final contractPath =
-      Platform.environment['CONTRACT_PATH'] ?? '../logistics-app-backend/openapi/openapi.yaml';
+  final contractPath = Platform.environment['CONTRACT_PATH'] ?? '../logistics-app-backend/openapi/openapi.yaml';
   final contract = loadYaml(File(contractPath).readAsStringSync()) as YamlMap;
   final paths = contract['paths'] as YamlMap;
 
