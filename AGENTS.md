@@ -86,7 +86,9 @@ Para añadir una operación: un `kind` y su `SyncChannel`. Los archivos nunca vi
 
 ## Convenciones
 
-- Comentarios en español; textos de la interfaz en inglés, sin capa de i18n todavía.
+- Comentarios y textos de la interfaz en español, sin capa de i18n todavía. Lo que manda el servidor en inglés no se enseña tal cual: `friendlyRejection` traduce por código de error.
+- Cada app tiene su `AppBrand` (color, logo y lema). Las pantallas usan los componentes de `widgets.dart`: botones y campos rellenos, sin contornos, y listas de `ItemCard`, cuyo estado se lee por color e icono.
+- La letra llega con `google_fonts`: se descarga la primera vez que hay red y hasta entonces se ve la del sistema. Antes de producción hay que empaquetarla.
 - El servidor decide las reglas: la app solo valida formato (`normalizeTicketCode`, números).
 - Rutas del API solo desde `ApiPaths` (`contract.g.dart`, generado). Si una ruta sale del contrato, el generador falla.
 - Pantallas por `AppScope.of(context)`, sin gestor de estado: los datos llegan por `watch` de la base.
@@ -94,5 +96,5 @@ Para añadir una operación: un `kind` y su `SyncChannel`. Los archivos nunca vi
 ## Límites conocidos
 
 - El generador produce rutas, no modelos: Scribe no emite `required`, y unos modelos con todo opcional no protegerían de nada.
-- Cámara, GPS y lector físico no se automatizan: el escaneo por cámara, la foto y la ubicación real no los cubren los tests.
+- Cámara, GPS y lector físico no se automatizan: el escaneo por cámara, la foto y la ubicación real no los cubren los tests. Los de la PDA abren `PdaHome` con `cameraEnabled: false` y escriben el código.
 - La base cifrada y el Keystore se probaron en el emulador; falta un equipo físico (Zebra/Honeywell).

@@ -9,10 +9,10 @@ import 'dart:io';
 const _common = ['android.permission.INTERNET', 'android.permission.ACCESS_NETWORK_STATE'];
 
 const _apps = <String, ({String label, List<String> permissions})>{
-  'pda': (label: 'Logistics PDA', permissions: ['android.permission.CAMERA', 'android.permission.VIBRATE']),
-  'flota': (label: 'Logistics Fleet', permissions: ['android.permission.CAMERA']),
+  'pda': (label: 'Almacén', permissions: ['android.permission.CAMERA', 'android.permission.VIBRATE']),
+  'flota': (label: 'Flota', permissions: ['android.permission.CAMERA']),
   'reparto': (
-    label: 'Logistics Delivery',
+    label: 'Reparto',
     permissions: [
       'android.permission.CAMERA',
       'android.permission.ACCESS_FINE_LOCATION',
@@ -20,7 +20,7 @@ const _apps = <String, ({String label, List<String> permissions})>{
     ],
   ),
   'corporativa': (
-    label: 'Logistics Staff',
+    label: 'Personal',
     permissions: ['android.permission.ACCESS_FINE_LOCATION', 'android.permission.ACCESS_COARSE_LOCATION'],
   ),
 };

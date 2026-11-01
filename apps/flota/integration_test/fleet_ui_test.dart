@@ -35,7 +35,7 @@ void main() {
 
     await tester.pumpWidget(
       LogisticsApp(
-        title: 'Logistics Fleet',
+        brand: AppBrand.flota,
         services: services,
         permission: 'routes.execute',
         home: (_) => RoutesHome(repository: repository),
@@ -61,7 +61,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(await services.ops.all([OpStatus.pending]), isEmpty);
-    expect(find.text('Status: assigned'), findsOneWidget);
+    expect(find.textContaining('Por iniciar'), findsWidgets);
 
     services.stopBackgroundSync();
     await services.db.close();

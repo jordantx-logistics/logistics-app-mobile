@@ -17,16 +17,19 @@ SyncChannel scansChannel(ApiClient api) => JsonBatchChannel(
 
 /// Tipos de escaneo del backend (`Scan::TYPES`).
 enum ScanType {
-  reception('reception', 'Reception', Icons.move_to_inbox, needsEmbark: false),
-  embark('embark', 'Embark', Icons.local_shipping, needsEmbark: true),
-  disembark('disembark', 'Disembark', Icons.unarchive, needsEmbark: true),
-  inventory('inventory', 'Inventory', Icons.inventory_2, needsEmbark: false),
-  outForDelivery('out_for_delivery', 'Out for delivery', Icons.delivery_dining, needsEmbark: false);
+  reception('reception', 'Recibir', 'Recibir en', Icons.move_to_inbox, needsEmbark: false),
+  embark('embark', 'Embarcar', 'Embarcar en', Icons.local_shipping, needsEmbark: true),
+  disembark('disembark', 'Desembarcar', 'Desembarcar de', Icons.unarchive, needsEmbark: true),
+  inventory('inventory', 'Inventario', 'Inventario en', Icons.inventory_2, needsEmbark: false),
+  outForDelivery('out_for_delivery', 'A reparto', 'Salida a reparto de', Icons.delivery_dining, needsEmbark: false);
 
-  const ScanType(this.code, this.label, this.icon, {required this.needsEmbark});
+  const ScanType(this.code, this.label, this.contextLabel, this.icon, {required this.needsEmbark});
 
   final String code;
   final String label;
+
+  /// Encabeza lo que se está escaneando: «Embarcar en B7K-482».
+  final String contextLabel;
   final IconData icon;
   final bool needsEmbark;
 }
@@ -46,8 +49,9 @@ class EmbarksRepository {
 
   final AppServices _services;
 
+  /// Lo más reciente se guarda para buscarlo sin red.
   Future<void> refresh() async {
-    final response = await _services.api.get(ApiPaths.embarks, query: {'per_page': 50});
+    final response = await _services.api.get(ApiPaths.embarks, query: {'per_page': 100});
     final rows = (response['data'] as List? ?? const []).cast<Map<dynamic, dynamic>>();
 
     await _services.cache.replaceAll(embarksNamespace, {
@@ -56,6 +60,44 @@ class EmbarksRepository {
   }
 
   Future<List<Map<String, dynamic>>> all() => _services.cache.all(embarksNamespace);
+
+  /// Lo que hay en el equipo, más lo que el servidor encuentre si hay red: puede ser un
+  /// manifiesto más antiguo que los guardados.
+  Future<List<Map<String, dynamic>>> search(String text) async {
+    final query = text.trim();
+
+    if (query.isEmpty) {
+      return _sorted(await all());
+    }
+
+    try {
+      final response = await _services.api.get(ApiPaths.embarks, query: {'search': query, 'per_page': 50});
+
+      for (final row in (response['data'] as List? ?? const []).cast<Map<dynamic, dynamic>>()) {
+        await _services.cache.put(embarksNamespace, row['id'].toString(), row.cast<String, dynamic>());
+      }
+    } on ApiException {
+      // Sin red se busca en lo guardado.
+    }
+
+    return _sorted(filterEmbarks(await all(), query));
+  }
+
+  List<Map<String, dynamic>> _sorted(List<Map<String, dynamic>> rows) {
+    return rows..sort((a, b) => '${b['departed_at']}'.compareTo('${a['departed_at']}'));
+  }
+}
+
+/// Coincide por placa o por ruta, sin importar mayúsculas ni guiones.
+List<Map<String, dynamic>> filterEmbarks(List<Map<String, dynamic>> rows, String text) {
+  String clean(Object? value) => '${value ?? ''}'.toUpperCase().replaceAll(RegExp('[^A-Z0-9]'), '');
+
+  final query = clean(text);
+
+  return [
+    for (final row in rows)
+      if (clean(row['vehicle_plate']).contains(query) || clean(row['route_ref']).contains(query)) row,
+  ];
 }
 
 /// Guarda el escaneo y responde al instante: la red es cosa del motor.

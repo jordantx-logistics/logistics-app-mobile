@@ -20,6 +20,8 @@ class SessionUser {
     required this.agencies,
     this.employeeId,
     this.employeeAgencyId,
+    this.agencyNames = const {},
+    this.lunchMinutes,
   });
 
   factory SessionUser.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,11 @@ class SessionUser {
       agencies: (json['agencies'] as List? ?? const []).cast<int>(),
       employeeId: json['employee_id'] as int?,
       employeeAgencyId: json['employee_agency_id'] as int?,
+      agencyNames: {
+        for (final entry in (json['agency_names'] as Map? ?? const {}).entries)
+          int.parse(entry.key.toString()): entry.value as String,
+      },
+      lunchMinutes: json['lunch_minutes'] as int?,
     );
   }
 
@@ -45,8 +52,18 @@ class SessionUser {
   final List<int> agencies;
   final int? employeeId;
   final int? employeeAgencyId;
+  final Map<int, String> agencyNames;
+
+  /// Minutos de almuerzo que da la agencia del empleado.
+  final int? lunchMinutes;
 
   bool can(String permission) => permissions.contains(permission);
+
+  /// Primer nombre, para saludar sin ocupar la cabecera.
+  String get firstName => name.trim().split(RegExp(r'\s+')).first;
+
+  /// Nombre de una agencia, o algo que se pueda mostrar si aún no se conoce.
+  String agencyName(int? id) => agencyNames[id] ?? 'Agencia ${id ?? '-'}';
 
   Map<String, dynamic> toJson() => {
     'user': {'id': id, 'name': name, 'email': email},
@@ -55,6 +72,8 @@ class SessionUser {
     'agencies': agencies,
     'employee_id': employeeId,
     'employee_agency_id': employeeAgencyId,
+    'agency_names': {for (final entry in agencyNames.entries) entry.key.toString(): entry.value},
+    'lunch_minutes': lunchMinutes,
   };
 }
 

@@ -34,6 +34,7 @@ const _operations = <String, String>{
   'fleetExpenses': 'POST /api/v1/fleet/expenses',
   'fleetMileage': 'POST /api/v1/fleet/routes/{route}/mileage',
   'attendanceMine': 'GET /api/v1/identity/attendance/mine',
+  'attendanceMineDays': 'GET /api/v1/identity/attendance/mine/days',
   'attendance': 'POST /api/v1/identity/attendance',
 };
 

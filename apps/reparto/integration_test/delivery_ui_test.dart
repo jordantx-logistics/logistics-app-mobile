@@ -35,7 +35,7 @@ void main() {
 
     await tester.pumpWidget(
       LogisticsApp(
-        title: 'Logistics Delivery',
+        brand: AppBrand.reparto,
         services: services,
         permission: 'delivery.execute',
         home: (_) => StopsHome(repository: repository),
@@ -56,11 +56,11 @@ void main() {
     expect(find.textContaining('Av. Lima'), findsWidgets);
 
     await tester.tap(find.byKey(const Key('stop.complete')));
-    await pumpUntil(tester, find.text('Confirm delivery'));
+    await pumpUntil(tester, find.byKey(const Key('deliver.confirm')));
 
     // Sin firma ni foto no deja confirmar.
-    await tester.tap(find.text('Confirm delivery'));
-    await pumpUntil(tester, find.textContaining('are required'));
+    await tester.tap(find.byKey(const Key('deliver.confirm')));
+    await pumpUntil(tester, find.textContaining('Falta:'));
     expect(await services.ops.all([OpStatus.pending]), isEmpty);
 
     services.stopBackgroundSync();
