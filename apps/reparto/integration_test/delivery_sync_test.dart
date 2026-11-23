@@ -63,7 +63,8 @@ void main() {
     await repository.refresh();
     final remaining = await services.cache.all(stopsNamespace);
 
-    expect(remaining.where((row) => row['id'] == stop['id']), isEmpty);
+    // Queda en la hoja como hecha: el repartidor puede comprobar lo que ya entregó.
+    expect(remaining.singleWhere((row) => row['id'] == stop['id'])['status'], 'delivered');
 
     await services.db.close();
   });

@@ -5,6 +5,7 @@ import 'package:logistics_core/logistics_core.dart';
 const fleetEventKind = 'fleet';
 const fleetReceiptKind = 'fleet_receipt';
 const routesNamespace = 'routes';
+const routeLogNamespace = 'route_log';
 
 String routeEntity(int routeId) => 'route-$routeId';
 
@@ -100,6 +101,37 @@ class RoutesRepository {
 
   Stream<List<Map<String, dynamic>>> watch() => _services.cache.watchAll(routesNamespace);
 
+  /// Lo que el chofer ha registrado en esta ruta. Se guarda aquí porque la cola se purga
+  /// y el chofer debe poder comprobar lo que ya anotó, con o sin señal.
+  Stream<List<Map<String, dynamic>>> watchLog(int routeId) {
+    return _services.cache
+        .watchAll(routeLogNamespace)
+        .map(
+          (rows) => [
+            for (final row in rows)
+              if (row['route_id'] == routeId) row,
+          ]..sort((a, b) => '${b['at']}'.compareTo('${a['at']}')),
+        );
+  }
+
+  Future<List<Map<String, dynamic>>> logOf(int routeId) async {
+    return [
+      for (final row in await _services.cache.all(routeLogNamespace))
+        if (row['route_id'] == routeId) row,
+    ];
+  }
+
+  Future<void> _log(int routeId, String type, String value) {
+    final at = DateTime.now().toUtc().toIso8601String();
+
+    return _services.cache.put(routeLogNamespace, '$routeId-$at', {
+      'route_id': routeId,
+      'type': type,
+      'value': value,
+      'at': at,
+    });
+  }
+
   Future<void> startRoute(Map<String, dynamic> route, String odometer, {DateTime? at}) {
     return _reading(route, 'route.start', odometer, 'in_progress', at);
   }
@@ -108,8 +140,9 @@ class RoutesRepository {
     return _reading(route, 'route.finish', odometer, 'finished', at);
   }
 
-  Future<void> addMileage(Map<String, dynamic> route, String odometer, {DateTime? at}) {
-    return _reading(route, 'mileage', odometer, null, at);
+  Future<void> addMileage(Map<String, dynamic> route, String odometer, {DateTime? at}) async {
+    await _reading(route, 'mileage', odometer, null, at);
+    await _log(route['id'] as int, 'mileage', odometer);
   }
 
   Future<void> completeSegment(Map<String, dynamic> route, int segmentId) async {
@@ -129,14 +162,15 @@ class RoutesRepository {
     await _save({...route, 'segments': segments});
   }
 
-  Future<void> addPerDiem(Map<String, dynamic> route, String amount) {
+  Future<void> addPerDiem(Map<String, dynamic> route, String amount) async {
     final routeId = route['id'] as int;
 
-    return _services.ops.enqueue(
+    await _services.ops.enqueue(
       kind: fleetEventKind,
       entityKey: routeEntity(routeId),
       payload: {'type': 'expense', 'route_id': routeId, 'expense_type': 'per_diem', 'amount': amount},
     );
+    await _log(routeId, 'per_diem', amount);
   }
 
   /// El servidor exige comprobante para el combustible: viaja por el canal de archivos.
@@ -146,15 +180,16 @@ class RoutesRepository {
     required String liters,
     required String receiptPath,
     String? odometer,
-  }) {
+  }) async {
     final routeId = route['id'] as int;
 
-    return _services.ops.enqueue(
+    await _services.ops.enqueue(
       kind: fleetReceiptKind,
       entityKey: routeEntity(routeId),
       payload: {'route_id': routeId, 'type': 'fuel', 'amount': amount, 'liters': liters, 'odometer_km': odometer},
       files: {'receipt': receiptPath},
     );
+    await _log(routeId, 'fuel', amount);
   }
 
   Future<void> _reading(Map<String, dynamic> route, String type, String odometer, String? status, DateTime? at) async {
@@ -172,7 +207,14 @@ class RoutesRepository {
     );
 
     if (status != null) {
-      await _save({...route, 'status': status});
+      final now = (at ?? DateTime.now()).toUtc().toIso8601String();
+
+      await _save({
+        ...route,
+        'status': status,
+        if (status == 'in_progress') 'started_at': now,
+        if (status == 'finished') 'finished_at': now,
+      });
     }
   }
 

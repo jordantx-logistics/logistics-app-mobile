@@ -17,5 +17,6 @@ abstract final class ApiPaths {
   static const fleetExpenses = '/api/v1/fleet/expenses';
   static String fleetMileage(Object route) => '/api/v1/fleet/routes/$route/mileage';
   static const attendanceMine = '/api/v1/identity/attendance/mine';
+  static const attendanceMineDays = '/api/v1/identity/attendance/mine/days';
   static const attendance = '/api/v1/identity/attendance';
 }

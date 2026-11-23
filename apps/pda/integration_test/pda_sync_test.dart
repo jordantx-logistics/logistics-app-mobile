@@ -163,10 +163,10 @@ void main() {
 
     await tester.pumpWidget(
       LogisticsApp(
-        title: 'Logistics PDA',
+        brand: AppBrand.almacen,
         services: services,
         permission: 'tracking.scan',
-        home: (_) => PdaHome(embarks: repository),
+        home: (_) => PdaHome(embarks: repository, cameraEnabled: false),
       ),
     );
     await tester.pumpAndSettle();
@@ -181,19 +181,26 @@ void main() {
     await _pumpUntil(tester, find.byKey(const Key('pda.reception')));
 
     await tester.tap(find.byKey(const Key('pda.reception')));
-    await _pumpUntil(tester, find.byKey(const Key('scan.input')));
+    await _pumpUntil(tester, find.byKey(const Key('scan.manual')));
 
-    await tester.enterText(find.byKey(const Key('scan.input')), 'nope');
-    await tester.testTextInput.receiveAction(TextInputAction.done);
-    await _pumpUntil(tester, find.textContaining('Invalid code'));
+    Future<void> writeCode(String value) async {
+      await tester.tap(find.byKey(const Key('scan.manual')));
+      await _pumpUntil(tester, find.byKey(const Key('scan.input')));
+      await tester.enterText(find.byKey(const Key('scan.input')), value);
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+    }
 
-    await tester.enterText(find.byKey(const Key('scan.input')), code(512).toLowerCase());
-    await tester.testTextInput.receiveAction(TextInputAction.done);
-    await _pumpUntil(tester, find.textContaining('saved'));
+    await writeCode('nope');
+    await _pumpUntil(tester, find.text('Código no válido'));
+    await tester.tap(find.byKey(const Key('scan.feedback_ok')));
+    await _pumpUntil(tester, find.byKey(const Key('scan.manual')));
 
-    await tester.enterText(find.byKey(const Key('scan.input')), code(512));
-    await tester.testTextInput.receiveAction(TextInputAction.done);
-    await _pumpUntil(tester, find.textContaining('already scanned'));
+    await writeCode(code(512).toLowerCase());
+    await _pumpUntil(tester, find.text('Guardado'));
+    await _pumpUntil(tester, find.byKey(const Key('scan.manual')));
+
+    await writeCode(code(512));
+    await _pumpUntil(tester, find.text('Ya está escaneado'));
 
     services.stopBackgroundSync();
     await services.db.close();

@@ -114,7 +114,8 @@ class StopsRepository {
   final AppServices _services;
 
   Future<void> refresh() async {
-    final response = await _services.api.get(ApiPaths.routeSheet);
+    // También lo cerrado hoy: el repartidor debe poder comprobar lo que ya hizo.
+    final response = await _services.api.get(ApiPaths.routeSheet, query: {'closed_today': 1});
     final rows = (response['data'] as List? ?? const []).cast<Map<dynamic, dynamic>>();
     final pending = await _services.ops.all([OpStatus.pending, OpStatus.conflict], kind: deliveryKind);
     final busy = pending.map((op) => op.entityKey).toSet();
